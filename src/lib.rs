@@ -131,3 +131,34 @@ impl GameOfLife {
         self.states = self.buffer.clone();
     }
 }
+
+mod render {
+    use super::GameOfLife;
+    use raylib;
+
+    struct BoardRenderInfo {
+        pub start_board_pos: raylib::prelude::Vector2,
+        pub line_width: i32,
+        pub cell_size: raylib::prelude::Vector2,
+        pub line_color: raylib::prelude::Color,
+        pub box_fill_color: raylib::prelude::Color,
+        pub box_bg_color: raylib::prelude::Color,
+    }
+
+    impl BoardRenderInfo {
+        pub fn new(
+            start_board_pos: raylib::prelude::Vector2,
+            line_width: i32,
+            cell_size: raylib::prelude::Vector2,
+        ) -> Self {
+            Self {
+                start_board_pos,
+                line_width,
+                cell_size,
+                line_color: raylib::prelude::Color::DARKBROWN,
+                box_fill_color: raylib::prelude::Color::ORANGE,
+                box_bg_color: raylib::prelude::Color::BROWN,
+            }
+        }
+    }
+}

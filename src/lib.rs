@@ -161,4 +161,12 @@ mod render {
             }
         }
     }
+
+    pub struct MainRender {
+        gof: GameOfLife,
+        board_info: BoardRenderInfo,
+        row_count: i32,
+        update_rate: f32,
+        accum_time: f32,
+    }
 }

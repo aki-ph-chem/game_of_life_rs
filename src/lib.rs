@@ -133,7 +133,7 @@ impl GameOfLife {
 }
 
 mod render {
-    use super::GameOfLife;
+    use super::{config, GameOfLife};
     use raylib;
 
     struct BoardRenderInfo {
@@ -166,7 +166,29 @@ mod render {
         gof: GameOfLife,
         board_info: BoardRenderInfo,
         row_count: i32,
+        col_count: i32,
         update_rate: f32,
         accum_time: f32,
+    }
+
+    impl MainRender {
+        pub fn new() -> Self {
+            Self {
+                gof: GameOfLife::new(
+                    config::DEFAULT_GRID_COUNT as i32,
+                    config::DEFAULT_GRID_COUNT as i32,
+                    config::DEFAULT_POPULATION,
+                ),
+                board_info: BoardRenderInfo::new(
+                    raylib::prelude::Vector2::zero(),
+                    0,
+                    raylib::prelude::Vector2::zero(),
+                ),
+                row_count: config::DEFAULT_GRID_COUNT as i32,
+                col_count: config::DEFAULT_GRID_COUNT as i32,
+                update_rate: config::GAME_UPDATE_RATE,
+                accum_time: 0.0,
+            }
+        }
     }
 }

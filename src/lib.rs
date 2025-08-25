@@ -134,7 +134,8 @@ impl GameOfLife {
 
 mod render {
     use super::{config, GameOfLife};
-    use raylib;
+    use raylib::ffi::GetFrameTime;
+    use raylib::{self, prelude::RaylibDraw};
 
     struct BoardRenderInfo {
         pub start_board_pos: raylib::prelude::Vector2,
@@ -211,6 +212,55 @@ mod render {
             self.board_info.cell_size.y = line_width / config::DEFAULT_GRID_COUNT as f32;
             self.board_info.start_board_pos.x = (config::SCREEN_WIDTH as f32 - line_width) / 2.0;
             self.board_info.start_board_pos.y = (config::SCREEN_HEIGHT as f32 - line_width) / 2.0;
+        }
+
+        pub fn draw(&mut self) {
+            while !self.raylib_handle.window_should_close() {
+                let mut d = self.raylib_handle.begin_drawing(&self.raylib_thread);
+                // shutdown by ESC or q
+                if d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_Q)
+                    || d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_ESCAPE)
+                {
+                    break;
+                }
+                d.clear_background(raylib::prelude::Color::LIGHTGRAY);
+
+                self.accum_time += unsafe { GetFrameTime() };
+                if self.accum_time > self.update_rate {
+                    self.accum_time -= self.update_rate;
+                    self.gof.update_board();
+                }
+
+                // draw fill grid
+                let board = &self.gof.states;
+                for i in 0..config::DEFAULT_GRID_COUNT {
+                    for j in 0..config::DEFAULT_GRID_COUNT {
+                        let mut cur_pos = self.board_info.start_board_pos;
+
+                        cur_pos.x += self.board_info.cell_size.x * (i as f32);
+                        cur_pos.y += self.board_info.cell_size.y * (j as f32);
+                        d.draw_rectangle_v(
+                            cur_pos,
+                            self.board_info.cell_size,
+                            if board[i][j].alive {
+                                self.board_info.box_fill_color
+                            } else {
+                                self.board_info.box_bg_color
+                            },
+                        );
+                    }
+                }
+
+                // draw box line
+                for dim in 0..2 {
+                    for j in 0..=config::DEFAULT_GRID_COUNT {
+                        if dim == 0 {
+                            let start_pos = self.board_info.start_board_pos;
+                            // ToDo
+                        }
+                    }
+                }
+            }
         }
     }
 }

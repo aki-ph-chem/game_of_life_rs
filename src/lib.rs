@@ -169,10 +169,18 @@ mod render {
         col_count: i32,
         update_rate: f32,
         accum_time: f32,
+        raylib_handle: raylib::prelude::RaylibHandle,
+        raylib_thread: raylib::prelude::RaylibThread,
     }
 
     impl MainRender {
         pub fn new() -> Self {
+            let (raylib_handle, raylib_thread) = raylib::init()
+                .size(config::SCREEN_WIDTH as i32, config::SCREEN_HEIGHT as i32)
+                .title("Game of Life")
+                .vsync()
+                .build();
+
             Self {
                 gof: GameOfLife::new(
                     config::DEFAULT_GRID_COUNT as i32,
@@ -188,7 +196,21 @@ mod render {
                 col_count: config::DEFAULT_GRID_COUNT as i32,
                 update_rate: config::GAME_UPDATE_RATE,
                 accum_time: 0.0,
+                raylib_handle,
+                raylib_thread,
             }
+        }
+
+        pub fn init(&mut self) {
+            self.raylib_handle.set_target_fps(40);
+            let line_width = (config::SCREEN_WIDTH).min(config::SCREEN_HEIGHT) as f32
+                * config::BOARD_DIMENSION_PERCENTAGE;
+
+            self.board_info.line_width = line_width.floor() as i32;
+            self.board_info.cell_size.x = line_width / config::DEFAULT_GRID_COUNT as f32;
+            self.board_info.cell_size.y = line_width / config::DEFAULT_GRID_COUNT as f32;
+            self.board_info.start_board_pos.x = (config::SCREEN_WIDTH as f32 - line_width) / 2.0;
+            self.board_info.start_board_pos.y = (config::SCREEN_HEIGHT as f32 - line_width) / 2.0;
         }
     }
 }

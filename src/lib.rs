@@ -132,7 +132,7 @@ impl GameOfLife {
     }
 }
 
-mod render {
+pub mod render {
     use super::{config, GameOfLife};
     use raylib::ffi::GetFrameTime;
     use raylib::{self, prelude::RaylibDraw};

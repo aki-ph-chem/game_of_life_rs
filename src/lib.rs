@@ -38,9 +38,21 @@ impl GameOfLife {
             (self.row_count as f32 * self.col_count as f32 * fill_factor).floor() as i32;
 
         while total_cnt > 0 {
+            if cfg!(debug_assertions) {
+                eprint!("total_cnt: {total_cnt} ");
+            }
+
             let x = rnd.random_range(0..(self.row_count - 1));
             let y = rnd.random_range(0..(self.col_count - 1));
+
+            if cfg!(debug_assertions) {
+                eprint!("x,y = ({x},{y}) ");
+            }
+
             if self.states[x as usize][y as usize].alive {
+                if cfg!(debug_assertions) {
+                    eprintln!("continue");
+                }
                 continue;
             }
 
@@ -170,18 +182,10 @@ pub mod render {
         col_count: i32,
         update_rate: f32,
         accum_time: f32,
-        raylib_handle: raylib::prelude::RaylibHandle,
-        raylib_thread: raylib::prelude::RaylibThread,
     }
 
     impl MainRender {
         pub fn new() -> Self {
-            let (raylib_handle, raylib_thread) = raylib::init()
-                .size(config::SCREEN_WIDTH as i32, config::SCREEN_HEIGHT as i32)
-                .title("Game of Life")
-                .vsync()
-                .build();
-
             Self {
                 gof: GameOfLife::new(
                     config::DEFAULT_GRID_COUNT as i32,
@@ -197,13 +201,10 @@ pub mod render {
                 col_count: config::DEFAULT_GRID_COUNT as i32,
                 update_rate: config::GAME_UPDATE_RATE,
                 accum_time: 0.0,
-                raylib_handle,
-                raylib_thread,
             }
         }
 
         pub fn init(&mut self) {
-            self.raylib_handle.set_target_fps(40);
             let line_width = (config::SCREEN_WIDTH).min(config::SCREEN_HEIGHT) as f32
                 * config::BOARD_DIMENSION_PERCENTAGE;
 
@@ -215,8 +216,15 @@ pub mod render {
         }
 
         pub fn draw(&mut self) {
-            while !self.raylib_handle.window_should_close() {
-                let mut d = self.raylib_handle.begin_drawing(&self.raylib_thread);
+            let (mut raylib_handle, raylib_thread) = raylib::init()
+                .size(config::SCREEN_WIDTH as i32, config::SCREEN_HEIGHT as i32)
+                .title("Game of Life")
+                .vsync()
+                .build();
+            raylib_handle.set_target_fps(40);
+
+            while !raylib_handle.window_should_close() {
+                let mut d = raylib_handle.begin_drawing(&raylib_thread);
                 // shutdown by ESC or q
                 if d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_Q)
                     || d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_ESCAPE)

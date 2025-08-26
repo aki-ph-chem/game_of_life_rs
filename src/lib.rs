@@ -255,8 +255,19 @@ mod render {
                 for dim in 0..2 {
                     for j in 0..=config::DEFAULT_GRID_COUNT {
                         if dim == 0 {
-                            let start_pos = self.board_info.start_board_pos;
-                            // ToDo
+                            let mut start_pos = self.board_info.start_board_pos;
+                            start_pos.x += j as f32 * self.board_info.line_width as f32
+                                / config::DEFAULT_GRID_COUNT as f32;
+                            let mut end_pos = start_pos;
+                            end_pos.y += self.board_info.line_width as f32;
+                            d.draw_rectangle_v(start_pos, end_pos, self.board_info.line_color);
+                        } else {
+                            let mut start_pos = self.board_info.start_board_pos;
+                            start_pos.y += j as f32 * self.board_info.line_width as f32
+                                / config::DEFAULT_GRID_COUNT as f32;
+                            let mut end_pos = start_pos;
+                            end_pos.x += self.board_info.line_width as f32;
+                            d.draw_rectangle_v(start_pos, end_pos, self.board_info.line_color);
                         }
                     }
                 }

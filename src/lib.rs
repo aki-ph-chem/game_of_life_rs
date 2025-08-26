@@ -18,6 +18,13 @@ pub struct CellState {
 }
 
 impl CellState {
+    pub fn new() -> Self {
+        Self {
+            alive: false,
+            neighbours_count: 0,
+        }
+    }
+
     pub fn swap_life(&mut self) {
         self.alive = !self.alive;
     }
@@ -85,16 +92,7 @@ impl GameOfLife {
     }
 
     pub fn new(row_count: i32, col_count: i32, fill_factor: f32) -> Self {
-        let states = vec![
-            vec![
-                CellState {
-                    alive: true,
-                    neighbours_count: 0
-                };
-                col_count as usize
-            ];
-            row_count as usize
-        ];
+        let states = vec![vec![CellState::new(); col_count as usize]; row_count as usize];
 
         let mut game_of_life = Self {
             row_count,
@@ -113,9 +111,10 @@ impl GameOfLife {
         for i in 0..self.row_count {
             for j in 0..self.col_count {
                 if self.states[i as usize][j as usize].alive
-                    && self.states[i as usize][j as usize].neighbours_count > 2
-                    || self.states[i as usize][j as usize].neighbours_count > 3
+                    && (self.states[i as usize][j as usize].neighbours_count < 2
+                        || self.states[i as usize][j as usize].neighbours_count > 3)
                 {
+                    self.buffer[i as usize][j as usize].swap_life();
                     Self::update_neighbours(
                         i,
                         j,
@@ -234,7 +233,7 @@ pub mod render {
                 d.clear_background(raylib::prelude::Color::LIGHTGRAY);
 
                 self.accum_time += unsafe { GetFrameTime() };
-                if self.accum_time > self.update_rate {
+                if self.accum_time >= self.update_rate {
                     self.accum_time -= self.update_rate;
                     self.gof.update_board();
                 }
@@ -268,17 +267,18 @@ pub mod render {
                                 / config::DEFAULT_GRID_COUNT as f32;
                             let mut end_pos = start_pos;
                             end_pos.y += self.board_info.line_width as f32;
-                            d.draw_rectangle_v(start_pos, end_pos, self.board_info.line_color);
+                            d.draw_line_v(start_pos, end_pos, self.board_info.line_color);
                         } else {
                             let mut start_pos = self.board_info.start_board_pos;
                             start_pos.y += j as f32 * self.board_info.line_width as f32
                                 / config::DEFAULT_GRID_COUNT as f32;
                             let mut end_pos = start_pos;
                             end_pos.x += self.board_info.line_width as f32;
-                            d.draw_rectangle_v(start_pos, end_pos, self.board_info.line_color);
+                            d.draw_line_v(start_pos, end_pos, self.board_info.line_color);
                         }
                     }
                 }
+                // end drawing logic in while
             }
         }
     }

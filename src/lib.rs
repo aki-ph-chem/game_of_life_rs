@@ -223,6 +223,7 @@ pub mod render {
                 .build();
             raylib_handle.set_target_fps(40);
 
+            let mut is_drawing_active = true;
             while !raylib_handle.window_should_close() {
                 let mut d = raylib_handle.begin_drawing(&raylib_thread);
                 // shutdown by ESC or q
@@ -231,12 +232,18 @@ pub mod render {
                 {
                     break;
                 }
+                if d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_S) {
+                    is_drawing_active = !is_drawing_active;
+                }
+
                 d.clear_background(raylib::prelude::Color::LIGHTGRAY);
 
-                self.accum_time += unsafe { GetFrameTime() };
-                if self.accum_time >= self.update_rate {
-                    self.accum_time -= self.update_rate;
-                    self.gof.update_board();
+                if is_drawing_active {
+                    self.accum_time += unsafe { GetFrameTime() };
+                    if self.accum_time >= self.update_rate {
+                        self.accum_time -= self.update_rate;
+                        self.gof.update_board();
+                    }
                 }
 
                 // draw fill grid

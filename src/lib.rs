@@ -78,7 +78,7 @@ impl GameOfLife {
         add_neighbour: bool,
     ) {
         for i in (x - 1).max(0)..(row_count.min(x + 2)) {
-            for j in (y - 1).max(0)..(col_count.midpoint(y + 2)) {
+            for j in (y - 1).max(0)..(col_count.min(y + 2)) {
                 if i == x && j == y {
                     continue;
                 }
@@ -219,6 +219,7 @@ pub mod render {
                 .size(config::SCREEN_WIDTH as i32, config::SCREEN_HEIGHT as i32)
                 .title("Game of Life")
                 .vsync()
+                .msaa_4x()
                 .build();
             raylib_handle.set_target_fps(40);
 

@@ -91,6 +91,10 @@ impl GameOfLife {
         }
     }
 
+    pub fn inc_neighbours(&mut self, x: i32, y: i32) {
+        Self::update_neighbours(x, y, self.row_count, self.col_count, &mut self.states, true);
+    }
+
     pub fn new(row_count: i32, col_count: i32, fill_factor: f32) -> Self {
         let states = vec![vec![CellState::new(); col_count as usize]; row_count as usize];
 
@@ -226,6 +230,8 @@ pub mod render {
             let mut is_drawing_active = true;
             while !raylib_handle.window_should_close() {
                 let mut d = raylib_handle.begin_drawing(&raylib_thread);
+                d.clear_background(raylib::prelude::Color::LIGHTGRAY);
+
                 // shutdown by ESC or q
                 if d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_Q)
                     || d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_ESCAPE)
@@ -238,15 +244,19 @@ pub mod render {
                 // detect mouse left click
                 if d.is_mouse_button_pressed(raylib::ffi::MouseButton::MOUSE_BUTTON_LEFT) {
                     let mouse_position = d.get_mouse_position();
+                    let delta_p = mouse_position - self.board_info.start_board_pos;
+                    let x = (delta_p.x / self.board_info.cell_size.x).floor() as i32;
+                    let y = (delta_p.y / self.board_info.cell_size.y).floor() as i32;
+
+                    self.gof.states[x as usize][y as usize].swap_life();
+                    self.gof.inc_neighbours(x, y);
 
                     if cfg!(debug_assertions) {
                         eprintln!("clicked!");
                         eprintln!("mouse_position: {:?}", mouse_position);
+                        eprintln!("i,j: {x},{y}");
                     }
-                    // ToDo: chlick cell & change pattern
                 }
-
-                d.clear_background(raylib::prelude::Color::LIGHTGRAY);
 
                 if is_drawing_active {
                     self.accum_time += unsafe { GetFrameTime() };

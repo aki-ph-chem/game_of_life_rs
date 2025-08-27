@@ -235,6 +235,16 @@ pub mod render {
                 if d.is_key_pressed(raylib::prelude::KeyboardKey::KEY_S) {
                     is_drawing_active = !is_drawing_active;
                 }
+                // detect mouse left click
+                if d.is_mouse_button_pressed(raylib::ffi::MouseButton::MOUSE_BUTTON_LEFT) {
+                    let mouse_position = d.get_mouse_position();
+
+                    if cfg!(debug_assertions) {
+                        eprintln!("clicked!");
+                        eprintln!("mouse_position: {:?}", mouse_position);
+                    }
+                    // ToDo: chlick cell & change pattern
+                }
 
                 d.clear_background(raylib::prelude::Color::LIGHTGRAY);
 

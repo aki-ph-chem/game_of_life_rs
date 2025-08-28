@@ -1,20 +1,28 @@
 # Game of Life Rust raylib
 
-## build
+## Demo
+
+<img src="./demo/demo_1.gif" />
+
+<img src="./demo/demo_2.gif" />
+
+## Build
 
 ```bash
-$ carogo build
+$ cargo build --release
 ```
 
-## run
+## Run
 
 ```bash
-$ carogo run --bin game_of_life
+$ cargo run --bin game_of_life
 ```
 
-## control
+## Control
 
 - Q or Esc
     - quit program
 - S
     - pause & restart
+- click cell
+    - activate this cell
